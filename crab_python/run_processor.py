@@ -10,7 +10,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import runsAn
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument( '--isMC', default=False, type=bool)
+#parser.add_argument( '--isMC', default=False, type=bool)
+parser.add_argument( '--isMC', default="False")
 parser.add_argument('--crab', default=False, action='store_true')
 parser.add_argument('--outfile', default='.')
 parser.add_argument('--maxEntries', default=None)
@@ -23,7 +24,8 @@ parser.add_argument("btag_type")
 parser.add_argument("selector")
 args = parser.parse_args()
 
-isMC = bool(args.isMC)
+isMC = args.isMC=="True"
+print("isMC", args.isMC, isMC)
 infile = args.infile
 outfile = args.outfile
 if args.maxEntries is not None: maxEntries = int(args.maxEntries)
