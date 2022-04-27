@@ -9,10 +9,8 @@ from root_numpy import tree2array
 class bffPreselProducer(Module):
     def beginJob(self):
         pass
-
     def endJob(self):
         pass
-
     def ptSel(self, obj, variation, met=0):
         if variation=="jerUp": pt = obj.pt_jerUp
         elif variation=="jerDown": pt = obj.pt_jerDown
@@ -47,7 +45,7 @@ class bffPreselProducer(Module):
            #set right filtering function
         if btag_type=="deepcsv":
             self.select_btag = deepcsv
-        elif btag_type=="DeepFlavour":
+        elif btag_type=="deepflavour":
             self.select_btag = deepflavour
         print("btag wp: {} type: {}".format(self.btagWP, btag_type))
         self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
@@ -64,7 +62,6 @@ class bffPreselProducer(Module):
         'alljetSel': lambda sel:self.alljetSel(sel,"nom"),
         'met': lambda sel:self.ptSel(sel,"nom",met=1)}
         pass
-
     def beginJob(self):
         pass
     def endJob(self):
@@ -133,7 +130,6 @@ class bffPreselProducer(Module):
         self._denis_cutflow_unweighted.Write()
         self._denis_cutflow_weighted.Write()
         prevdir.cd()
-
     def selectDiMu(self, electrons, muons):
         if len(muons) != 2:
             return False
@@ -209,8 +205,8 @@ class bffPreselProducer(Module):
             MET = Object(event, "MET_T1Smear")
         else:
             MET = Object(event,"MET")
-        electronsLowPt = sorted(filter(lambda x: self.eleSel(x,24), Collection(event, "Electron")), key=lambda x: x.pt)
-        muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
+        electronsLowPt = sorted(filter(lambda x: self.eleSel(x,10), Collection(event, "Electron")), key=lambda x: x.pt)
+        muonsLowPt = sorted(filter(lambda x: self.muSel(x,10), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
                         
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
@@ -220,17 +216,17 @@ class bffPreselProducer(Module):
         #cutflow after nlep
         self.fill_cutflow(3, binary_gen_weight)
         #Denis specific cuts
-        if len(muons)>=1:
+        if len(electrons)>=1:
             self.fill_denis_cutflow(3, binary_gen_weight)
-            if len(muons)==2:
+            if len(electrons)==2:
                 self.fill_denis_cutflow(4, binary_gen_weight)
-                if (muons[0].charge+muons[1].charge) == 0:
+                if (electrons[0].charge+electrons[1].charge) == 0:
                     self.fill_denis_cutflow(5, binary_gen_weight)
-                    if len(electrons)==0:
+                    if len(muons)==0:
                         self.fill_denis_cutflow(6, binary_gen_weight)
                         if nLowPtLep<3:
                             self.fill_denis_cutflow(7, binary_gen_weight)
-        if isDiMu: self.fill_denis_cutflow(8, binary_gen_weight)  
+        if isDiEle: self.fill_denis_cutflow(8, binary_gen_weight)  
             
         if not (isDiMu or isDiEle or isEleMu):
             return False
@@ -339,8 +335,8 @@ class bffPreselProducer(Module):
             if key == "nom": 
                 #cutflow after njets
                 self.fill_cutflow(4, binary_gen_weight)
-                if isDiMu  & (n_Bjets == 1): self.fill_denis_cutflow(9, binary_gen_weight)
-                if isSR1: self.fill_denis_cutflow(10, binary_gen_weight)
+                if isDiEle  & (n_Bjets == 1): self.fill_denis_cutflow(9, binary_gen_weight)
+                if isCR13: self.fill_denis_cutflow(10, binary_gen_weight)
             self.out.fillBranch("TMB_{}".format(key), sbm)
             self.out.fillBranch("TMBMin_{}".format(key), sbmMin)
             self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
