@@ -6,7 +6,6 @@ from PhysicsTools.NanoAODTools.postprocessing.trigger.triggerFilter import trigg
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsProducer
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import runsAndLumis
 
-
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -22,6 +21,7 @@ parser.add_argument("triggers")
 parser.add_argument("btagWP", type=float)
 parser.add_argument("btag_type")
 parser.add_argument("selector")
+parser.add_argument("keep_and_drop")
 args = parser.parse_args()
 
 isMC = args.isMC=="True"
@@ -37,6 +37,7 @@ triggers = eval(args.triggers)
 btagWP = float(args.btagWP)
 btag_type = args.btag_type
 selector = args.selector
+keep_and_drop = args.keep_and_drop
 crab = args.crab
 
 print('Arguments:')
@@ -53,10 +54,6 @@ print('\t {}'.format(args))
 #btag_type = 'deepcsv'
 #selector = 'minseok'
 #crab = True
-
-
-
-keep_and_drop = 'keep_and_drop_bff.txt'
 
 #select right module
 if isMC:
@@ -83,6 +80,8 @@ if selector=='inclusive':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffInclusive_preselectionModule import bffInclusivePreselProducer as preselectorProducer
 if selector=='bff':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffPreselModule import bffPreselProducer as preselectorProducer
+if selector=='bff_eff':
+    from PhysicsTools.NanoAODTools.postprocessing.bff.bffBtagEff import bffBtagEffProducer as preselectorProducer    
 if selector=='minseok':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffPreselModule_minseok import bffPreselProducer as preselectorProducer
 
@@ -96,6 +95,13 @@ else:
     print("get input file (crab)")
     infile = inputFiles()
 print("infile", infile)
+#2017 EE fix
+conditions_dict = {
+    '2016':{'MET':'MET'},
+    '2017':{'MET':'METFixEE2017'},
+    '2018':{'MET':'MET'}
+}
+
 #set up process for mc and data
 if isMC:
     jmeCorrections = createJMECorrector(
@@ -103,6 +109,7 @@ if isMC:
             dataYear=dataYear,
             runPeriod=runPeriod,
             jesUncert="Total",
+            metBranchName=conditions_dict[dataYear]['MET'],
             applySmearing=True,
             jetType="AK4PFchs",
             noGroom=False
@@ -115,7 +122,7 @@ if isMC:
             puWeight(),
             muonScaleRes(),
             lepSF(),
-            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type)
+            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
         ]
     p = PostProcessor(outfile,
             infile,
@@ -130,7 +137,7 @@ else:
             countHistogramsProducer(),
             #triggerFilter(triggers),
             muonScaleRes(),
-            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type)
+            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
         ]
 
     p = PostProcessor(outfile,

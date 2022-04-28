@@ -34,7 +34,9 @@ class bffPreselProducer(Module):
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False):
+    def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False,
+                MET='MET'):
+        self.MET=MET
         self.triggers = triggers
         self.btagWP = btagWP
         #select different btags
@@ -202,9 +204,9 @@ class bffPreselProducer(Module):
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
         muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         if self.isMC:
-            MET = Object(event, "MET_T1Smear")
+            MET = Object(event, "{}_T1Smear".format(self.MET))
         else:
-            MET = Object(event,"MET")
+            MET = Object(event, self.MET)
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,10), Collection(event, "Electron")), key=lambda x: x.pt)
         muonsLowPt = sorted(filter(lambda x: self.muSel(x,10), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
