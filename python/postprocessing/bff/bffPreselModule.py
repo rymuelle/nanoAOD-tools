@@ -36,6 +36,7 @@ class bffPreselProducer(Module):
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
     def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False,
                 MET='MET'):
+        self.nselected = 0
         self.MET=MET
         self.triggers = triggers
         self.btagWP = btagWP
@@ -67,7 +68,7 @@ class bffPreselProducer(Module):
     def beginJob(self):
         pass
     def endJob(self):
-        pass
+        print("all selected: {}".format(self.nselected))
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         '''
         In case of data, the b-tagging scale factors are not produced. 
@@ -131,7 +132,7 @@ class bffPreselProducer(Module):
         self._cutflow_unweighted.Write()
         self._denis_cutflow_unweighted.Write()
         self._denis_cutflow_weighted.Write()
-        prevdir.cd()
+        prevdir.cd()        
     def selectDiMu(self, electrons, muons):
         if len(muons) != 2:
             return False
@@ -207,10 +208,13 @@ class bffPreselProducer(Module):
             MET = Object(event, "{}_T1Smear".format(self.MET))
         else:
             MET = Object(event, self.MET)
-        electronsLowPt = sorted(filter(lambda x: self.eleSel(x,10), Collection(event, "Electron")), key=lambda x: x.pt)
-        muonsLowPt = sorted(filter(lambda x: self.muSel(x,10), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
+          
+        #veto if additional lepton greater than x pt
+        lowPtMuonVeto = 10
+        electronsLowPt = sorted(filter(lambda x: self.eleSel(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
+        muonsLowPt = sorted(filter(lambda x: self.muSel(x,lowPtMuonVeto), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
-                        
+        print(nLowPtLep, len(Collection(event, "Muon")) + len(Collection(event, "Electron")) )
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
         isEleMu = self.selectEleMu(electrons, muons) and nLowPtLep<3
@@ -343,6 +347,8 @@ class bffPreselProducer(Module):
             self.out.fillBranch("TMBMin_{}".format(key), sbmMin)
             self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
 
-        if eventSelected: return True
+        if eventSelected: 
+            self.nselected+=1
+            return True
         else: return True
 
