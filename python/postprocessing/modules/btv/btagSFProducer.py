@@ -36,7 +36,7 @@ class btagSFProducer(Module):
     """
 
     def __init__(
-            self, era, algo='csvv2', selectedWPs=['M', 'shape_corr'],
+            self, era, algo='deepflavour', selectedWPs=['M', 'shape_corr'],
             sfFileName=None, verbose=0, jesSystsForShape=["jes"]
     ):
         self.era = era
@@ -103,7 +103,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 '2018': {
-                    'inputFileName': "DeepCSV_102XSF_V1.csv",
+                    'inputFileName': "DeepJet_102XSF_V2.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -121,9 +121,9 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
             },
-            'deepjet': {
+            'deepflavour': {
                 '2016': {
-                    'inputFileName': "DeepJet_2016LegacySF_V1.csv",
+                    'inputFileName': "DeepJet_2016LegacySF_V1_TuneCP5.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -132,7 +132,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 '2017': {
-                    'inputFileName': "DeepFlavour_94XSF_V3_B_F.csv",
+                    'inputFileName': "DeepFlavour_94XSF_V4_B_F.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
