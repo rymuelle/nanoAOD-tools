@@ -50,6 +50,7 @@ class bffPreselProducer(Module):
             self.select_btag = deepcsv
         elif btag_type=="deepflavour":
             self.select_btag = deepflavour
+        self.btag_type = btag_type
         print("btag wp: {} type: {}".format(self.btagWP, btag_type))
         self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
                                & (x.pfRelIso04_all < 0.25))
@@ -214,7 +215,7 @@ class bffPreselProducer(Module):
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
         muonsLowPt = sorted(filter(lambda x: self.muSel(x,lowPtMuonVeto), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
-        print(nLowPtLep, len(Collection(event, "Muon")) + len(Collection(event, "Electron")) )
+
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
         isEleMu = self.selectEleMu(electrons, muons) and nLowPtLep<3
@@ -275,7 +276,7 @@ class bffPreselProducer(Module):
             jetSFWeight = 1
             if self.isMC:
                 for j in jets:
-                    jetSFWeight *= j.btagSF_deepcsv_M
+                    jetSFWeight *= j['btagSF_{}_M'.format(self.btag_type)]
             self.out.fillBranch("JetSFWeight_{}".format(key), jetSFWeight)
 
             htlt = (sum([j.pt for j in jets]) 

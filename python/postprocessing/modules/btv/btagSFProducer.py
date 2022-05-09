@@ -53,6 +53,7 @@ class btagSFProducer(Module):
         self.inputFileName = sfFileName
         self.measurement_types = None
         self.supported_wp = None
+        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation2016Legacy
         supported_btagSF = {
             'csvv2': {
                 'Old2016': {
@@ -123,7 +124,7 @@ class btagSFProducer(Module):
             },
             'deepflavour': {
                 '2016': {
-                    'inputFileName': "DeepJet_2016LegacySF_V1_TuneCP5.csv",
+                    'inputFileName': "DeepJet_2016LegacySF_V1.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -201,7 +202,8 @@ class btagSFProducer(Module):
             if wp not in self.supported_wp:
                 raise ValueError("ERROR: Working point '%s' not supported for algo = '%s' and era = '%s'! Please choose among { %s }." % (
                     wp, self.algo, self.era, self.supported_wp))
-
+        print("BTagging: using file {} in era {} for algo {}".format(self.inputFileName, self.era, self.algo))
+        
         # load libraries for accessing b-tag scale factors (SFs) from conditions database
         for library in ["libCondFormatsBTauObjects", "libCondToolsBTau"]:
             if library not in ROOT.gSystem.GetLibraries():
@@ -358,7 +360,7 @@ class btagSFProducer(Module):
             discr = "btagDeepB"
         elif self.algo == "cmva":
             discr = "btagCMVA"
-        elif self.algo == "deepjet":
+        elif self.algo == "deepflavour":
             discr = "btagDeepFlavB"
         else:
             raise ValueError("ERROR: Invalid algorithm '%s'!" % self.algo)
@@ -383,4 +385,4 @@ class btagSFProducer(Module):
 btagSF2016 = lambda : btagSFProducer("2016","deepcsv")
 btagSF2017 = lambda : btagSFProducer("2017","deepcsv")
 btagSF2018 = lambda : btagSFProducer("2018","deepcsv")
-btagSF = lambda era: btagSFProducer(era,"deepcsv")
+btagSF = lambda era, algo: btagSFProducer(era, algo)
