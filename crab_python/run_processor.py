@@ -56,6 +56,7 @@ print('\t {}'.format(args))
 #crab = True
 
 #select right module
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.heepV72018PromptProducer import heepV72018PromptProducer
 if isMC:
     from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSF
     from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import createJMECorrector
@@ -117,11 +118,12 @@ if isMC:
     modules=[
             countHistogramsProducer(),
             #triggerFilter(triggers),
-            btagSF(dataYear),
+            btagSF(dataYear, algo=btag_type),
             jmeCorrections(),
             puWeight(),
             muonScaleRes(),
             lepSF(),
+            heepV72018PromptProducer(),
             preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
         ]
     p = PostProcessor(outfile,
@@ -137,6 +139,7 @@ else:
             countHistogramsProducer(),
             #triggerFilter(triggers),
             muonScaleRes(),
+            heepV72018PromptProducer(),
             preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
         ]
 
