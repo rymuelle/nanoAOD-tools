@@ -6,7 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 import numpy as np
 
 class bffBtagEffProducer(Module):
-    def __init__(self, btagWP, btag_type="DeepCSV"):
+    def __init__(self, btagWP, triggers, btag_type="deepcsv", **kwargs):
         self.alljetSel = lambda j: ((j.pt > 20) & (abs(j.eta) < 2.4) & ((j.jetId >> 1) & 1) & ((j.puId & 1) | (j.pt>50)))
         self.isMC = True
         self.btagWP = btagWP
@@ -15,11 +15,10 @@ class bffBtagEffProducer(Module):
         def deepflavour(jet):
             return jet.btagDeepFlavB > self.btagWP
            #set right filtering function
-        if btag_type=="DeepCSV":
+        if btag_type=="deepcsv":
             self.select_btag = deepcsv
-        elif btag_type=="DeepFlavour":
+        elif btag_type=="deepflavour":
             self.select_btag = deepflavour
-            
         pass
     def beginJob(self):
         pass
@@ -67,26 +66,17 @@ class bffBtagEffProducer(Module):
                         break
                     bin-=1
                 if bin>=0:
-                  flavor = 2
-                  if j.genJetIdx>=0:
-                      if j.hadronFlavour==5:
-                          flavor=0
-                      elif j.hadronFlavour==4:
-                          flavor=1
-                  if self.select_btag(j): 
-                      self.Pass[flavor][bin] += 1
-                  self.Total[flavor][bin]+= 1
+                    flavor = 2
+                    if j.genJetIdx>=0:
+                        if j.hadronFlavour==5:
+                            flavor=0
+                        elif j.hadronFlavour==4:
+                            flavor=1
+                    if self.select_btag(j): 
+                        self.Pass[flavor][bin] += 1
+                    self.Total[flavor][bin]+= 1
 	else:
             pass
         self.out._tree.Fill()
 
         return True
-
-
-# define modules using the syntax 'name = lambda: constructor'
-# to avoid having them loaded when not needed
-
-bffBtagEffModuleConstr2016 = lambda: bffBtagEffProducer(0.6321) #medium btagging DeepCSV wp RunIISummer16, 17Jul2018 rereco
-bffBtagEffModuleConstr2017 = lambda: bffBtagEffProducer(0.4941) #medium btagging DeepCSV wp RunIIFall17, 17Nov2017 
-bffBtagEffModuleConstr2018 = lambda: bffBtagEffProducer(0.4184) #medium btagging DeepCSV wp RunIIAutumn18, 17Sep2018
-
