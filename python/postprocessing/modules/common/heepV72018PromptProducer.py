@@ -26,8 +26,7 @@ def nBit(n):
 def get_rho(event):
     rhoBranchName = "fixedGridRhoFastjetAll"
     rho = getattr(event, rhoBranchName)
-    pv = Object(event, "PV")
-    return pv.npvs
+    return rho
 
 def is_endcap_electron(electron):
     '''define if electron is in endcap.
