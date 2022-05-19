@@ -24,6 +24,8 @@ def nBit(n):
     return int(log2_value)
 
 def get_rho(event):
+    rhoBranchName = "fixedGridRhoFastjetAll"
+    rho = getattr(event, rhoBranchName)
     pv = Object(event, "PV")
     return pv.npvs
 
