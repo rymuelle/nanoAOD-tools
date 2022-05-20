@@ -98,9 +98,9 @@ else:
 print("infile", infile)
 #2017 EE fix
 conditions_dict = {
-    '2016':{'MET':'MET'},
-    '2017':{'MET':'METFixEE2017'},
-    '2018':{'MET':'MET'}
+    '2016':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEP'},
+    '2017':{'metBranchName':'METFixEE2017', 'heepBranchName': 'cutBased_HEEP'},
+    '2018':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEPV7p0_2018Prompt'}
 }
 
 #set up process for mc and data

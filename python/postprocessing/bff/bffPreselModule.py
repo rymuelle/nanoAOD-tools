@@ -35,9 +35,9 @@ class bffPreselProducer(Module):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
     def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False,
-                MET='MET'):
+                metBranchName='MET', heepBranchName='cutBased_HEEP'):
         self.nselected = 0
-        self.MET=MET
+        self.metBranchName=metBranchName
         self.triggers = triggers
         self.btagWP = btagWP
         #select different btags
@@ -54,7 +54,7 @@ class bffPreselProducer(Module):
         print("btag wp: {} type: {}".format(self.btagWP, btag_type))
         self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
                                & (x.pfRelIso04_all < 0.25))
-        self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x.cutBased_HEEP > 0)
+        self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x[heepBranchName] > 0)
         self.diLepMass = -1
         self.lep_1 = ROOT.TLorentzVector()
         self.lep_2 = ROOT.TLorentzVector()
@@ -206,9 +206,9 @@ class bffPreselProducer(Module):
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
         muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         if self.isMC:
-            MET = Object(event, "{}_T1Smear".format(self.MET))
+            MET = Object(event, "{}_T1Smear".format(self.metBranchName))
         else:
-            MET = Object(event, self.MET)
+            MET = Object(event, self.metBranchName)
           
         #veto if additional lepton greater than x pt
         lowPtMuonVeto = 10
