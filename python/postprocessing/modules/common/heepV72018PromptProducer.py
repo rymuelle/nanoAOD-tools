@@ -59,6 +59,10 @@ def heepV72018Prompt_em_p_had_iso_cut(electron, Et, rho):
             return em_p_had_iso_value < 2.5 + 0.03 * (Et - 50) + rho_coef * rho
         
 def passes_heepV72018Prompt_cuts(electron, rho):
+    #if not endcap, return original HEEP cut
+    if not is_endcap_electron(electron): return electron.cutBased_HEEP
+    # reject middle etas https://indico.cern.ch/event/787315/contributions/3434898/attachments/1847223/3031172/HEEP_2019_0517_v3.pdf
+    #if abs(electron.eta)>1.4442 and abs(electron.eta)<1.566: return False
     #define electron lorentz vector
     electron_LV = PtEtaPhiMVector(electron.pt, electron.eta, electron.phi, electron.mass)
     #compute new cuts
@@ -73,13 +77,13 @@ def passes_heepV72018Prompt_cuts(electron, rho):
     return vidNestedWPBitmapHEEP==4095
 
 class heepV72018PromptProducer(Module):
-    def __init__(self):
-        pass
+    def __init__(self, verbose=False):
+        self.verbose = verbose
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("Electron_cutBased_HEEPV7p0_2018Prompt", "B", lenVar="nElectron")
     def beginJob(self):
-        pass
+        if self.verbose: print("pt,eta,new_heep,old_heep")
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
@@ -90,6 +94,9 @@ class heepV72018PromptProducer(Module):
         rho = get_rho(event)
         #apply cut
         Electron_cutBased_HEEPV7p0_2018Prompt = list(map(lambda x: passes_heepV72018Prompt_cuts(x, rho), electrons))
+        if self.verbose: 
+            for heep_2018, electron in zip(Electron_cutBased_HEEPV7p0_2018Prompt, electrons):
+                print "{},{},{},{}".format(electron.pt, electron.eta, int(heep_2018), int(electron.cutBased_HEEP))
         #fill new branch
         self.out.fillBranch("Electron_cutBased_HEEPV7p0_2018Prompt", Electron_cutBased_HEEPV7p0_2018Prompt)
         return True
