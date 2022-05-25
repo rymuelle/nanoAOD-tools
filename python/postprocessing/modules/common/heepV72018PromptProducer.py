@@ -38,7 +38,7 @@ def is_endcap_electron(electron):
 def heepV72018Prompt_HOE_cut(electron, energy, rho):
     is_endcap = is_endcap_electron(electron)
     if not is_endcap: 
-        return electron.hoe < 1.0 / electron.eCorr +0.05
+        return electron.hoe < 1.0 / energy + 0.05
     else: 
         energy_numerator = (-0.4 + 0.4 * abs(electron.eta)) * rho
         return electron.hoe < energy_numerator / energy + 0.05
