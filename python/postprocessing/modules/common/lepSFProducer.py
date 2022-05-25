@@ -40,7 +40,8 @@ class lepSFProducer(Module):
 
 
         if muonSelectionTag=="muonSF_2016_weighted_legacy":
-            self.mu_weights = [0.549334044,1-0.549334044] #luminositiy weighted for different trigger menus
+            luminosity_proportion = 0.549334044
+            self.mu_weights = [luminosity_proportion,1-luminosity_proportion] #luminositiy weighted for different trigger menus
             self.mu_f=[
                   ["EfficienciesAndSF_RunBtoF.root",
                   "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunBCDEF_SF_ID.root",
