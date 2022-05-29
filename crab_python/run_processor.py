@@ -110,7 +110,7 @@ if isMC:
             dataYear=dataYear,
             runPeriod=runPeriod,
             jesUncert="Total",
-            metBranchName=conditions_dict[dataYear]['MET'],
+            metBranchName=conditions_dict[dataYear]['metBranchName'],
             applySmearing=True,
             jetType="AK4PFchs",
             noGroom=False
