@@ -7,9 +7,12 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
         self.mu_f_name = ["trigger","ID","ISO"]
+        #identifies which f is for the trigger
+        self.trigger_index = 0
         self.mu_f_sys_name = ["ID","ISO"]
         #2016 muon legacy
         if muonSelectionTag=="muonSF_2016_GH_legacy":
@@ -241,11 +244,21 @@ class lepSFProducer(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         muons = Collection(event, "Muon")
         electrons = Collection(event, "Electron")
-
+        trigObjs = Collection(event, "TrigObj")
+        muonTrigObjs = list(filter(muon_selection, trigObjs))
         averaged_sf_mu = self.computeSFlist(self._worker_mu,self.mu_h,muons,False)
         averaged_sf_mu_stat = self.computeSFlist(self._worker_mu,self.mu_h,muons,True)
         averaged_sf_mu_sys = self.computeSFlist(self._worker_sys_mu,self.mu_sys_h,muons,True)
-
+        #set trigger sf to 1 if not trigger object
+        for i, muon in enumerate(muons):
+            muonIsTriggerObj = False
+            for muonTrigObj in muonTrigObjs:
+                if deltaR(muonTrigObj, muon) < 0.4:
+                    muonIsTriggerObj = True
+                    break
+            if not muonIsTriggerObj:
+                averaged_sf_mu[i][self.trigger_index] = 1
+                
         for i, type_SF in enumerate(self.mu_f_name):
             self.out.fillBranch("Muon_effSF_{}".format(type_SF), averaged_sf_mu[i])
             self.out.fillBranch("Muon_effSF_stat_{}".format(type_SF), averaged_sf_mu_stat[i])
@@ -261,6 +274,12 @@ class lepSFProducer(Module):
         self.out.fillBranch("Electron_effSF_stat", el_stat)
         self.out.fillBranch("Electron_effSF_sys", el_sys)
         return True
+                      
+def deltaR(obj1, obj2):
+    return ((obj1.phi-obj2.phi)**2+(obj1.eta-obj2.eta)**2)**.5
+def isKthBitSet(n, k): return bool(n & (1 << (k-1)))
+def muon_selection(trigObj):
+    return (trigObj.id==13) & isKthBitSet(trigObj.filterBits, 11)
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
