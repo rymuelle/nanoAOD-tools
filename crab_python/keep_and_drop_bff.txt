@@ -27,3 +27,7 @@ keep HLT_DoubleEle25_CaloIdL_MW
 keep *ilter*
 keep Flag_*
 keep inNregions
+keep *Btag
+keep run
+keep L1PreFiringWeight*
+keep TrigObj*
