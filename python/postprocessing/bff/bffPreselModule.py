@@ -6,6 +6,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 import numpy as np
 from root_numpy import tree2array
 
+def is_within_deltaR(obj, collection, deltaR=0.4):
+    for obj2 in collection:
+        if obj2.DeltaR(obj) < deltaR: return True
+    return False
+        
 class bffPreselProducer(Module):
     def beginJob(self):
         pass
@@ -35,7 +40,9 @@ class bffPreselProducer(Module):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
     def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False,
-                metBranchName='MET', heepBranchName='cutBased_HEEP'):
+                metBranchName='MET', heepBranchName='cutBased_HEEP',
+                record_dataframe= False):
+        self.record_dataframe = record_dataframe
         self.nselected = 0
         self.metBranchName=metBranchName
         self.triggers = triggers
@@ -67,8 +74,14 @@ class bffPreselProducer(Module):
         'met': lambda sel:self.ptSel(sel,"nom",met=1)}
         pass
     def beginJob(self):
+        if self.record_dataframe:
+            self.list = []
         pass
     def endJob(self):
+        if self.record_dataframe:
+            import pandas as pd
+            df = pd.DataFrame(self.list)
+            df.to_csv('event_df.csv')
         print("all selected: {}".format(self.nselected))
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         '''
@@ -188,6 +201,7 @@ class bffPreselProducer(Module):
         self._denis_cutflow_weighted.Fill(value, binary_gen_weight)
         
     def analyze(self, event):
+        event_dict = {}
         #get +/- gen weight as in countHistogramModule
         binary_gen_weight = self.get_binary_event_weight(event)
         #cutflow all events
@@ -213,6 +227,12 @@ class bffPreselProducer(Module):
         #veto if additional lepton greater than x pt
         lowPtMuonVeto = 10
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
+        event_dict['nElectronsLowPt'] = len(electronsLowPt)
+        #reject low pt electrons that are too close to jets            
+        jets = sorted(filter(lambda sel: self.alljetSel(sel,"nom"), Collection(event, "Jet")), key=lambda x: self.ptSel(x,'nom'))
+        electronsLowPt = sorted(filter(lambda x: not is_within_deltaR(x, jets), electronsLowPt))
+        event_dict['nElectronsLowPt_post_dr_cut'] = len(electronsLowPt)
+        
         muonsLowPt = sorted(filter(lambda x: self.muSel(x,lowPtMuonVeto), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
 
@@ -254,7 +274,9 @@ class bffPreselProducer(Module):
                 return minDR
 
             muon_dr = [minDR(jet, muonsLowPt) for jet in jets]
+            #questionably useful with deltaR cut above
             electron_dr = [minDR(jet, electronsLowPt) for jet in jets]
+            electron_dr += [minDR(jet, electrons) for jet in jets]
             dr_arr = np.array([muon_dr, electron_dr])
             dr_cut_arr =  dr_arr.min(axis=0) > .4
            
@@ -349,6 +371,8 @@ class bffPreselProducer(Module):
             self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
 
         if eventSelected: 
+            if self.record_dataframe:
+                self.list.append(event_dict)
             self.nselected+=1
             return True
         else: return True
