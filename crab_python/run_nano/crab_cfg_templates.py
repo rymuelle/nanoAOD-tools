@@ -5,6 +5,7 @@ config = Configuration()
 config.section_('General')
 config.General.requestName = '{requestName}'
 config.General.transferLogs = False
+config.General.workArea ='work_areas'
 config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
@@ -36,6 +37,7 @@ config = Configuration()
 config.section_('General')
 config.General.requestName = '{requestName}'
 config.General.transferLogs = False
+config.General.workArea ='work_areas'
 config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
