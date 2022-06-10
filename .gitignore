@@ -8,3 +8,6 @@ build
 *.d
 *.so
 *.pcm
+
+#don't track crab configs
+crab_python/crab_cfg/*
