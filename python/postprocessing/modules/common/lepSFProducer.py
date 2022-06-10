@@ -258,6 +258,7 @@ class lepSFProducer(Module):
                     break
             if not muonIsTriggerObj:
                 averaged_sf_mu[self.trigger_index][i] = 1
+                averaged_sf_mu_stat[self.trigger_index][i] = 1
                 
         for i, type_SF in enumerate(self.mu_f_name):
             self.out.fillBranch("Muon_effSF_{}".format(type_SF), averaged_sf_mu[i])
