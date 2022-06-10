@@ -6,6 +6,7 @@ config = Configuration()
 config.section_('General')
 config.General.requestName = '2017_data_DoubleEGB_DoubleEG_deepcsv_minseok'
 config.General.transferLogs = False
+config.General.workArea ='work_areas'
 config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
@@ -20,7 +21,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 1
-if 'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'!=0:
+if 'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'!='0':
     config.Data.lumiMask = 'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 
 config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/crab/2017'
