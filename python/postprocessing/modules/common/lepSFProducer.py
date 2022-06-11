@@ -2,11 +2,11 @@ import ROOT
 import os
 import numpy as np
 import json
+import copy
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-
 
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
@@ -17,124 +17,123 @@ class lepSFProducer(Module):
         #2016 muon legacy
         if muonSelectionTag=="muonSF_2016_GH_legacy":
             self.mu_weights = [1]
-            self.mu_f=[["EfficienciesAndSF_Period4.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunGH_SF_ID.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunGH_SF_ISO.root"]]
-            self.mu_h = ["Mu50_OR_TkMu50_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_genTracks_eta_pt",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt"]
-            self.mu_sys_f=[["EfficienciesStudies_2016_legacy_rereco_systematic_RunGH_SF_ID.root",
-                    "EfficienciesStudies_2016_legacy_rereco_systematic_RunGH_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_genTracks_eta_pt_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt_syst"]
+            self.mu_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/2016_RunGH_SF_ID.root",
+                "muon_legacy/2016_RunGH_SF_ISO.root"
+            ]]
+            self.mu_h = [
+                "SF_2016_var",
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_stat",
+                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
+            ]
+            self.mu_sys_f=[[                  
+                "muon_legacy/2016_RunGH_SF_ID.root",
+                "muon_legacy/2016_RunGH_SF_ISO.root"
+            ]]
+            self.mu_sys_h = [
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
+            ]
 
         if muonSelectionTag=="muonSF_2016_BCDEF_legacy":
             self.mu_weights = [1]
-            self.mu_f=[["EfficienciesAndSF_RunBtoF.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunBCDEF_SF_ID.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunBCDEF_SF_ISO.root"]]
-            self.mu_h = ["Mu50_OR_TkMu50_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_genTracks_eta_pt",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt"]
-            self.mu_sys_f=[["EfficienciesStudies_2016_legacy_rereco_systematic_RunBCDEF_SF_ID.root",
-                    "EfficienciesStudies_2016_legacy_rereco_systematic_RunBCDEF_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_genTracks_eta_pt_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt_syst"]
+            self.mu_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/2016_RunBCDEF_SF_ID.root",
+                "muon_legacy/2016_RunBCDEF_SF_ISO.root"
+            ]]
+            self.mu_h = [
+                "SF_2016_var",
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_stat",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
+            ]
+            self.mu_sys_f=[[                  
+                "muon_legacy/2016_RunBCDEF_SF_ID.root",
+                "muon_legacy/2016_RunBCDEF_SF_ISO.root"
+            ]]
+            self.mu_sys_h = [
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
+            ]
 
 
         if muonSelectionTag=="muonSF_2016_weighted_legacy":
             luminosity_proportion = 0.549334044
             self.mu_weights = [luminosity_proportion,1-luminosity_proportion] #luminositiy weighted for different trigger menus
             self.mu_f=[
-                  ["EfficienciesAndSF_RunBtoF.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunBCDEF_SF_ID.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunBCDEF_SF_ISO.root"],
-                  ["EfficienciesAndSF_Period4.root", #check this
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunGH_SF_ID.root",
-                  "EfficienciesStudies_2016_legacy_rereco_rootfiles_RunGH_SF_ISO.root"]
+                          [
+                              "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                              "muon_legacy/2016_RunBCDEF_SF_ID.root",
+                              "muon_legacy/2016_RunBCDEF_SF_ISO.root"
+                          ],
+                          [
+                              "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                              "muon_legacy/2016_RunGH_SF_ID.root",
+                              "muon_legacy/2016_RunGH_SF_ISO.root"
+                          ]
                   ]
-            self.mu_h = ["Mu50_OR_TkMu50_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_genTracks_eta_pt",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt"]
-            self.mu_sys_f=[["EfficienciesStudies_2016_legacy_rereco_systematic_RunBCDEF_SF_ID.root",
-                    "EfficienciesStudies_2016_legacy_rereco_systematic_RunBCDEF_SF_ISO.root"],
-                    ["EfficienciesStudies_2016_legacy_rereco_systematic_RunGH_SF_ID.root",
-                    "EfficienciesStudies_2016_legacy_rereco_systematic_RunGH_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_genTracks_eta_pt_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt_syst"]
-
-        #2016 muon
-        if muonSelectionTag=="muonSF_2016_BCDEF":
-            self.mu_weights = [1]
-            mu_f=[["EfficienciesAndSF_RunBtoF.root",
-                  "EfficienciesAndSF_BCDEF.root",
-                  "EfficienciesAndSF_BCDEF-2.root"]]
-            mu_h = ["Mu50_OR_TkMu50_PtEtaBins/pt_abseta_ratio",
-                    "TightISO_TightID_pt_eta/pt_abseta_ratio",
-                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"]
-        if muonSelectionTag=="muonSF_2016_GH":
-            self.mu_weights = [1]
-            mu_f=[["EfficienciesAndSF_Period4.root",
-                  "EfficienciesAndSF_GH.root",
-                  "EfficienciesAndSF_GH-2.root"]]
-            mu_h = ["Mu50_OR_TkMu50_PtEtaBins/pt_abseta_ratio",
-                    "TightISO_TightID_pt_eta/pt_abseta_ratio",
-                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"]
+            self.mu_h = [
+                "SF_2016_var",
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_stat",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
+            ]
+            self.mu_sys_f=[[
+                "muon_legacy/2016_RunBCDEF_SF_ID.root",
+                "muon_legacy/2016_RunBCDEF_SF_ISO.root"
+            ],
+            [
+                "muon_legacy/2016_RunGH_SF_ID.root",
+                "muon_legacy/2016_RunGH_SF_ISO.root"
+            ],
+            ]
+            self.mu_sys_h = [
+                "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
+            ]
         #2017 muon
         if muonSelectionTag=="muonSF_2017":
             self.mu_weights = [1]
-            self.mu_f=[["EfficienciesAndSF_RunBtoF_Nov17Nov2017.root",
-                  "RunBCDEF_SF_ID_2017.root",
-                  "RunBCDEF_SF_ISO_2017.root"]]
-            self.mu_h = ["Mu50_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_genTracks_pt_abseta",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta"]
-            self.mu_sys_f=[["RunBCDEF_2017_SF_ID_syst.root",
-                    "RunBCDEF_2017_SF_ISO_syst.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_genTracks_pt_abseta_syst",
-                    "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta_syst"]
+            self.mu_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/2017_RunBCDEF_SF_ID_syst.root",
+                "muon_legacy/2017_RunBCDEF_SF_ISO_syst.root"
+            ]]
+            self.mu_h = [
+                "SF_2017_var",
+                "NUM_HighPtID_DEN_genTracks_pair_newTuneP_probe_pt_abseta_stat",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_stat"
+            ]
+            self.mu_sys_f=[[
+                "muon_legacy/2017_RunBCDEF_SF_ID_syst.root",
+                "muon_legacy/2017_RunBCDEF_SF_ISO_syst.root"
+            ]]
+            self.mu_sys_h = [
+                "NUM_HighPtID_DEN_genTracks_pair_newTuneP_probe_pt_abseta_syst",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_syst"
+            ]
         #2018 muon
-        if muonSelectionTag=="muonSF_2018_beforeHLT":
+        if muonSelectionTag=="muonSF_2018":
             self.mu_weights = [1]
-            self.mu_f=[["EfficienciesStudies_2018_trigger_EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_h = ["Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_TrackerMuons_pt_abseta",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta"]
-            self.mu_sys_f=[["EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                    "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta_syst"]
-        if muonSelectionTag=="muonSF_2018_afterHLT":
-            self.mu_weights = [1]
-            self.mu_f=[["EfficienciesStudies_2018_trigger_EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_h = ["Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_TrackerMuons_pt_abseta",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta"]
-            self.mu_sys_f=[["EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                    "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta_syst"]
-        if muonSelectionTag=="muonSF_2018_weighted":
-            self.mu_weights = [0.1593444345,1-0.1593444345] #luminositiy weighted for different trigger menus
-            self.mu_f=[["EfficienciesStudies_2018_trigger_EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"],
-                  ["EfficienciesStudies_2018_trigger_EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                  "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_h = ["Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",
-                    "NUM_TightID_DEN_TrackerMuons_pt_abseta",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta"]
-            self.mu_sys_f=[["EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                    "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"],
-                    ["EfficienciesStudies_2018_rootfiles_RunABCD_SF_ID.root",
-                    "EfficienciesStudies_2018_rootfiles_RunABCD_SF_ISO.root"]]
-            self.mu_sys_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst",
-                    "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta_syst"]
+            self.mu_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/2018_RunABCD_SF_ID.root",
+                "muon_legacy/2018_RunABCD_SF_ISO.root"
+            ]]
+            self.mu_h = [
+                "SF_2018_var",
+                "NUM_HighPtID_DEN_TrackerMuons_pair_newTuneP_probe_pt_abseta_stat",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_stat"
+            ]
+            self.mu_sys_f=[[
+                "muon_legacy/2018_RunABCD_SF_ID.root",
+                "muon_legacy/2018_RunABCD_SF_ISO.root"
+            ]]
+            self.mu_sys_h = [
+                "NUM_HighPtID_DEN_TrackerMuons_pair_newTuneP_probe_pt_abseta_syst",
+                "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_syst"
+            ]
+
         #egamma
         if electronSelectionTag=="egamma_2016_legacy":
             self.el_SF_EB = 0.983
@@ -248,6 +247,12 @@ class lepSFProducer(Module):
         muonTrigObjs = list(filter(muon_selection, trigObjs))
         averaged_sf_mu = self.computeSFlist(self._worker_mu,self.mu_h,muons,False)
         averaged_sf_mu_stat = self.computeSFlist(self._worker_mu,self.mu_h,muons,True)
+        # trigger histogram error and center value is switched, so flip them
+        trigger_center_value = copy.deepcopy(averaged_sf_mu[0])
+        trigger_error = copy.deepcopy(averaged_sf_mu_stat[0])
+        averaged_sf_mu[0] = trigger_error
+        averaged_sf_mu_stat[0] = trigger_center_value
+        
         averaged_sf_mu_sys = self.computeSFlist(self._worker_sys_mu,self.mu_sys_h,muons,True)
         #set trigger sf to 1 if not trigger object
         for i, muon in enumerate(muons):
@@ -284,12 +289,10 @@ def muon_selection(trigObj):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-lepSF2016 = lambda : lepSFProducer( "muonSF_2016_weighted_legacy", "egamma_2016_legacy") #MC
+lepSF2016 = lambda : lepSFProducer( "muonSF_2016_weighted_legacy", "egamma_2016_legacy")
 lepSF2016_GH_legacy = lambda : lepSFProducer( "muonSF_2016_GH_legacy", "egamma_2016_legacy")
 lepSF2016_BtoF_legacy = lambda : lepSFProducer( "muonSF_2016_BCDEF_legacy", "egamma_2016_legacy")
 
 lepSF2017 = lambda : lepSFProducer( "muonSF_2017", "egamma_2017")
 
-lepSF2018 = lambda : lepSFProducer( "muonSF_2018_weighted", "egamma_2018") #MC
-lepSF2018_beforeHLT = lambda : lepSFProducer( "muonSF_2018_beforeHLT", "egamma_2018")
-lepSF2018_afterHLT = lambda : lepSFProducer( "muonSF_2018_afterHLT", "egamma_2018")
+lepSF2018 = lambda : lepSFProducer( "muonSF_2018", "egamma_2018")
