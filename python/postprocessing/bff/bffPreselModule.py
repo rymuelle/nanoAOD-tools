@@ -59,7 +59,7 @@ class bffPreselProducer(Module):
             self.select_btag = deepflavour
         self.btag_type = btag_type
         print("btag wp: {} type: {}".format(self.btagWP, btag_type))
-        self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
+        self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.highPtId > 0) 
                                & (x.pfRelIso04_all < 0.25))
         self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x[heepBranchName] > 0)
         self.diLepMass = -1
