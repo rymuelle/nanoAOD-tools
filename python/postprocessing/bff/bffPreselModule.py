@@ -37,9 +37,8 @@ class bffPreselProducer(Module):
         pt = self.ptSel(jet,variation)
         return ((pt > 30) & (not self.select_btag(jet)) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt > 50)))
     def alljetSel(self, jet, variation):
-        btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False,
+    def __init__(self, btagWP, triggers, btag_type="deepflavour", isMC=False, dr_cut=False,
                 metBranchName='MET', heepBranchName='cutBased_HEEP',
                 record_dataframe= False):
         self.record_dataframe = record_dataframe
