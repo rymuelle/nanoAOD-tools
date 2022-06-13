@@ -115,17 +115,25 @@ if isMC:
             jetType="AK4PFchs",
             noGroom=False
         )
-    modules=[
-            countHistogramsProducer(),
-            #triggerFilter(triggers),
-            btagSF(dataYear, algo=btag_type),
-            jmeCorrections(),
-            puWeight(),
-            muonScaleRes(),
-            lepSF(),
-            heepV72018PromptProducer(),
-            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
-        ]
+    #don't use all modules for bff efficency calculation
+    if 'eff' not in selector:
+            modules=[
+                countHistogramsProducer(),
+                triggerFilter(triggers),
+                btagSF(dataYear, algo=btag_type),
+                jmeCorrections(),
+                puWeight(),
+                muonScaleRes(),
+                lepSF(),
+                heepV72018PromptProducer(),
+                preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])
+            ]
+    else:
+            modules=[
+                btagSF(dataYear, algo=btag_type),
+                jmeCorrections(),
+                preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])
+            ]
     p = PostProcessor(outfile,
             infile,
             modules=modules,
