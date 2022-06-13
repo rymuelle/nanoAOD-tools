@@ -145,7 +145,7 @@ if isMC:
 else:
     modules=[
             countHistogramsProducer(),
-            #triggerFilter(triggers),
+            triggerFilter(triggers),
             muonScaleRes(),
             heepV72018PromptProducer(),
             preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
