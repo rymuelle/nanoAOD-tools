@@ -10,7 +10,13 @@ def is_within_deltaR(obj, collection, deltaR=0.4):
     for obj2 in collection:
         if obj2.DeltaR(obj) < deltaR: return True
     return False
-        
+
+def minDR(x,ys):
+    minDR = 9999
+    for y in ys:
+        minDR =min(minDR, x.p4().DeltaR(y.p4()))
+    return minDR
+
 class bffPreselProducer(Module):
     def beginJob(self):
         pass
@@ -21,6 +27,8 @@ class bffPreselProducer(Module):
         elif variation=="jerDown": pt = obj.pt_jerDown
         elif variation=="jesTotalUp": pt = obj.pt_jesTotalUp
         elif variation=="jesTotalDown": pt = obj.pt_jesTotalDown
+        elif variation=="jesHEMIssueUp": pt = obj.pt_jesHEMIssueUp
+        elif variation=="jesHEMIssueDown": pt = obj.pt_jesHEMIssueDown            
         else: 
             if met: pt = obj.pt
             else:
@@ -40,7 +48,9 @@ class bffPreselProducer(Module):
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
     def __init__(self, btagWP, triggers, btag_type="deepflavour", isMC=False, dr_cut=False,
                 metBranchName='MET', heepBranchName='cutBased_HEEP',
-                record_dataframe= False):
+                record_dataframe= False,
+                applyHEMfix=False):
+        self.applyHEMfix = applyHEMfix
         self.record_dataframe = record_dataframe
         self.nselected = 0
         self.metBranchName=metBranchName
@@ -96,6 +106,16 @@ class bffPreselProducer(Module):
         self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
         print(self._triggers)
         if self.isMC:
+            if self.applyHEMfix:
+                self.sysDict['jesHEMIssueUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesHEMIssueUp"),
+                'bjetSel': lambda sel:self.bjetSel(sel,"jesHEMIssueUp"),
+                'alljetSel': lambda sel:self.alljetSel(sel,"jesHEMIssueUp"),
+                'met': lambda sel:self.ptSel(sel,"jesHEMIssueUp", met=1)}
+                self.sysDict['jesHEMIssueDown']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesHEMIssueDown"),
+                'bjetSel': lambda sel:self.bjetSel(sel,"jesHEMIssueDown"),
+                'alljetSel': lambda sel:self.alljetSel(sel,"jesHEMIssueDown"),
+                'met': lambda sel:self.ptSel(sel,"jesHEMIssueDown", met=1)}
+           
             self.sysDict['jerUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jerUp"),
             'bjetSel': lambda sel:self.bjetSel(sel,"jerUp"),
             'alljetSel': lambda sel:self.alljetSel(sel,"jerUp"),
@@ -214,7 +234,7 @@ class bffPreselProducer(Module):
         #cutflow after hlt
         self.fill_cutflow(2, binary_gen_weight)
         self.fill_denis_cutflow(2, binary_gen_weight)
-        
+        jets = sorted(filter(lambda sel: self.alljetSel(sel,"nom"), Collection(event, "Jet")), key=lambda x: self.ptSel(x,'nom'))
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
         muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         if self.isMC:
@@ -226,8 +246,8 @@ class bffPreselProducer(Module):
         lowPtMuonVeto = 10
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
         event_dict['nElectronsLowPt'] = len(electronsLowPt)
-        #reject low pt electrons that are too close to jets            
-        jets = sorted(filter(lambda sel: self.alljetSel(sel,"nom"), Collection(event, "Jet")), key=lambda x: self.ptSel(x,'nom'))
+        #reject low pt electrons that are too close to jets    
+        
         electronsLowPt = sorted(filter(lambda x: not is_within_deltaR(x, jets), electronsLowPt))
         event_dict['nElectronsLowPt_post_dr_cut'] = len(electronsLowPt)
         
@@ -265,12 +285,6 @@ class bffPreselProducer(Module):
             """process event, return True (go to next module) or False (fail, go to next event)"""
             jets = sorted(filter(alljetSel, Collection(event, "Jet")), key=lambda x: self.ptSel(x,key))
 
-            def minDR(x,ys):
-                minDR = 9999
-                for y in ys:
-                    minDR =min(minDR, x.p4().DeltaR(y.p4()))
-                return minDR
-
             muon_dr = [minDR(jet, muonsLowPt) for jet in jets]
             #questionably useful with deltaR cut above
             electron_dr = [minDR(jet, electronsLowPt) for jet in jets]
@@ -290,7 +304,6 @@ class bffPreselProducer(Module):
             self.out.fillBranch("nSeljets_{}".format(key), n_alljets)
 
             if n_alljets==1 or n_alljets==2:
-
                 eventSelected = True
 
             jetSFWeight = 1
