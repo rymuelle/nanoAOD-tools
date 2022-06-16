@@ -98,9 +98,9 @@ else:
 print("infile", infile)
 #2017 EE fix
 conditions_dict = {
-    '2016':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEP'},
-    '2017':{'metBranchName':'METFixEE2017', 'heepBranchName': 'cutBased_HEEP'},
-    '2018':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEPV7p0_2018Prompt'}
+    '2016':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEP', 'applyHEMfix':False},
+    '2017':{'metBranchName':'METFixEE2017', 'heepBranchName': 'cutBased_HEEP', 'applyHEMfix':False},
+    '2018':{'metBranchName':'MET', 'heepBranchName': 'cutBased_HEEPV7p0_2018Prompt', 'applyHEMfix':True}
 }
 
 #set up process for mc and data
@@ -113,7 +113,8 @@ if isMC:
             metBranchName=conditions_dict[dataYear]['metBranchName'],
             applySmearing=True,
             jetType="AK4PFchs",
-            noGroom=False
+            noGroom=False,
+            applyHEMfix= conditions_dict[dataYear]['applyHEMfix'],
         )
     #don't use all modules for bff efficency calculation
     if 'eff' not in selector:
@@ -126,7 +127,12 @@ if isMC:
                 muonScaleRes(),
                 lepSF(),
                 heepV72018PromptProducer(),
-                preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])
+                preselectorProducer(btagWP, 
+                                    triggers, 
+                                    isMC=isMC, 
+                                    btag_type=btag_type, 
+                                    record_dataframe=True, 
+                                    **conditions_dict[dataYear])
             ]
     else:
             modules=[
