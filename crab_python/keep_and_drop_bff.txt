@@ -31,3 +31,4 @@ keep *Btag
 keep run
 keep L1PreFiringWeight*
 keep TrigObj*
+keep Gen*
