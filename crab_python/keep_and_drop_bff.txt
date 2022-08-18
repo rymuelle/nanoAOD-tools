@@ -32,3 +32,8 @@ keep run
 keep L1PreFiringWeight*
 keep TrigObj*
 keep Gen*
+keep Good*
+keep nLep
+keep nLowPtLep
+keep minGoodJet*
+keep Weight*

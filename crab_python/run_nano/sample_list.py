@@ -166,7 +166,30 @@ sample_list = [
 {"era": 2018, "ismc":0, "type": "data", "name": "EGammaB", "das": "/EGamma/Run2018B-02Apr2020-v1/NANOAOD"},
 {"era": 2018, "ismc":0, "type": "data", "name": "EGammaC", "das": "/EGamma/Run2018C-02Apr2020-v1/NANOAOD"},
 {"era": 2018, "ismc":0, "type": "data", "name": "EGammaD", "das": "/EGamma/Run2018D-02Apr2020-v1/NANOAOD"},     
-    
+
+
+#dy samples for stitching
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_nlo", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_nlo_v2", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8_ext3-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_mad_v2", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv7-PU2017RECOSIMstep_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8_ext1-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_mad", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv7-PU2017RECOSIMstep_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_100_200", "das": "/DYJetsToLL_M-100to200_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_200_400", "das": "/DYJetsToLL_M-200to400_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_400_500", "das": "/DYJetsToLL_M-400to500_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_500_700", "das": "/DYJetsToLL_M-500to700_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_700_800", "das": "/DYJetsToLL_M-700to800_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+{"era": 2017, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_800_1000", "das": "/DYJetsToLL_M-800to1000_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM"},
+
+
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_nlo", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_nlo_v2", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext2-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_50_mad", "das": "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_100_200", "das": "/DYJetsToLL_M-100to200_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_200_400", "das": "/DYJetsToLL_M-200to400_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_400_500", "das": "/DYJetsToLL_M-400to500_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_500_700", "das": "/DYJetsToLL_M-500to700_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_700_800", "das": "/DYJetsToLL_M-700to800_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
+{"era": 2018, "ismc": 1.0, "type": "DYJets", "name": "DYJLL_M_800_1000", "das": "/DYJetsToLL_M-800to1000_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM"},
 
 
 ]

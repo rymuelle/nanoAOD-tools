@@ -49,7 +49,8 @@ class bffPreselProducer(Module):
     def __init__(self, btagWP, triggers, btag_type="deepflavour", isMC=False, dr_cut=False,
                 metBranchName='MET', heepBranchName='cutBased_HEEP',
                 record_dataframe= False,
-                applyHEMfix=False):
+                applyHEMfix=False, 
+                metBranchPostFix=""):
         self.applyHEMfix = applyHEMfix
         self.record_dataframe = record_dataframe
         self.nselected = 0
@@ -62,14 +63,17 @@ class bffPreselProducer(Module):
         def deepflavour(jet):
             return jet.btagDeepFlavB > self.btagWP
            #set right filtering function
+        print("btag_type", btag_type)
         if btag_type=="deepcsv":
             self.select_btag = deepcsv
         elif btag_type=="deepflavour":
             self.select_btag = deepflavour
+        print(self.select_btag)
         self.btag_type = btag_type
         print("btag wp: {} type: {}".format(self.btagWP, btag_type))
         self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.highPtId > 0) & (x.tkRelIso < .1))
         self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x[heepBranchName] > 0)
+        self.eleSelLowPt = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x.mvaFall17V2Iso_WPL > 0)
         self.diLepMass = -1
         self.lep_1 = ROOT.TLorentzVector()
         self.lep_2 = ROOT.TLorentzVector()
@@ -133,7 +137,21 @@ class bffPreselProducer(Module):
             'alljetSel': lambda sel:self.alljetSel(sel,"jesTotalDown"),
             'met': lambda sel:self.ptSel(sel,"jesTotalDown",met=1)}
         self.out = wrappedOutputTree
-        self.out.branch("inNregions", "F")
+        self.out.branch("inNregions", "B")
+        self.out.branch("GoodJet", "B", lenVar="nJet")
+        self.out.branch("GoodBJet", "B", lenVar="nJet")
+        self.out.branch("GoodMuon", "B", lenVar="nMuon")
+        self.out.branch("GoodElectron", "B", lenVar="nElectron")
+        self.out.branch("GoodMuonLowPt", "B", lenVar="nMuon")
+        self.out.branch("GoodElectronLowPt", "B", lenVar="nElectron")
+        
+        self.out.branch("minGoodJetElDR", "F")
+        self.out.branch("minGoodJetMuDR", "F")
+        
+        self.out.branch("nLep", "I")
+        self.out.branch("nLowPtLep", "I")        
+        
+        self.out.branch("inNregions", "B")
         for key in self.sysDict:
             self.out.branch("nBjets_{}".format(key), "F")
             self.out.branch("nSeljets_{}".format(key), "F")
@@ -234,6 +252,20 @@ class bffPreselProducer(Module):
         #cutflow after hlt
         self.fill_cutflow(2, binary_gen_weight)
         self.fill_denis_cutflow(2, binary_gen_weight)
+        
+        jets = Collection(event, "Jet")
+        electrons = Collection(event, "Electron")
+        muons = Collection(event, "Muon")
+        
+        goodJets = [self.alljetSel(jet,"nom") for jet in jets]
+        goodBJets = [self.bjetSel(jet,"nom") for jet in jets]
+        
+        goodMuons = [self.muSel(mu,53) for mu in muons]
+        goodMuonsLowPt = [self.muSel(mu,10) for mu in muons]
+
+        goodElectrons = [self.eleSel(el,53) for el in electrons]
+        goodElectronsLowPt = [self.eleSelLowPt(el,10) for el in electrons]
+        
         jets = sorted(filter(lambda sel: self.alljetSel(sel,"nom"), Collection(event, "Jet")), key=lambda x: self.ptSel(x,'nom'))
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
         muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
@@ -244,15 +276,18 @@ class bffPreselProducer(Module):
           
         #veto if additional lepton greater than x pt
         lowPtMuonVeto = 10
-        electronsLowPt = sorted(filter(lambda x: self.eleSel(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
+        electronsLowPt = sorted(filter(lambda x: self.eleSelLowPt(x,lowPtMuonVeto), Collection(event, "Electron")), key=lambda x: x.pt)
         event_dict['nElectronsLowPt'] = len(electronsLowPt)
         #reject low pt electrons that are too close to jets    
+        minGoodJetElDR = min([minDR(x, jets) for x in electrons] + [999])
+        minGoodJetMuDR = min([minDR(x, jets) for x in muons] + [9999])
         
         electronsLowPt = sorted(filter(lambda x: not is_within_deltaR(x, jets), electronsLowPt))
         event_dict['nElectronsLowPt_post_dr_cut'] = len(electronsLowPt)
         
         muonsLowPt = sorted(filter(lambda x: self.muSel(x,lowPtMuonVeto), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
+        nLep = len(electrons)+len(muons)
 
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
@@ -380,11 +415,21 @@ class bffPreselProducer(Module):
             self.out.fillBranch("TMB_{}".format(key), sbm)
             self.out.fillBranch("TMBMin_{}".format(key), sbmMin)
             self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
-
+            self.out.fillBranch("GoodJet", goodJets)
+            self.out.fillBranch("GoodBJet", goodBJets)
+            self.out.fillBranch("GoodMuon", goodMuons)
+            self.out.fillBranch("GoodElectron", goodElectrons)
+            self.out.fillBranch("GoodMuonLowPt", goodMuonsLowPt)
+            self.out.fillBranch("GoodElectronLowPt", goodElectronsLowPt)
+            self.out.fillBranch("minGoodJetElDR", minGoodJetElDR)
+            self.out.fillBranch("minGoodJetMuDR", minGoodJetMuDR)
+            self.out.fillBranch("nLowPtLep", nLowPtLep)
+            self.out.fillBranch("nLep", nLep)            
+        
+        nLowPtLep
         if eventSelected: 
             if self.record_dataframe:
                 self.list.append(event_dict)
             self.nselected+=1
             return True
         else: return True
-

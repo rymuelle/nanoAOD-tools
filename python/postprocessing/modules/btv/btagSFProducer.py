@@ -382,7 +382,7 @@ class btagSFProducer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 
-btagSF2016 = lambda : btagSFProducer("2016","deepcsv")
-btagSF2017 = lambda : btagSFProducer("2017","deepcsv")
-btagSF2018 = lambda : btagSFProducer("2018","deepcsv")
+btagSF2016 = lambda : btagSFProducer("2016","deepflavour")
+btagSF2017 = lambda : btagSFProducer("2017","deepflavour")
+btagSF2018 = lambda : btagSFProducer("2018","deepflavour")
 btagSF = lambda era, algo: btagSFProducer(era, algo)
