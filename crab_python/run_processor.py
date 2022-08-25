@@ -58,17 +58,19 @@ print('\t {}'.format(args))
 #select right module
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.heepV72018PromptProducer import heepV72018PromptProducer
 if isMC:
-    from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSF
     from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import createJMECorrector
     if dataYear=='2016':
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import lepSF2016 as lepSF
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight_2016 as puWeight
+        from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSF2016 as btagSF
     if dataYear=='2017':
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import lepSF2017 as lepSF
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight_2017 as puWeight
+        from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSF2017 as btagSF
     if dataYear=='2018':
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import lepSF2018 as lepSF
         from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight_2018 as puWeight
+        from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSF2018 as btagSF
 if dataYear=='2016':
     from PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProducer import muonScaleRes2016 as muonScaleRes
 if dataYear=='2017':
@@ -76,11 +78,15 @@ if dataYear=='2017':
 if dataYear=='2018':
     from PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProducer import muonScaleRes2018 as muonScaleRes
 
+print(btagSF)
+
 #different preselection producerts
 if selector=='inclusive':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffInclusive_preselectionModule import bffInclusivePreselProducer as preselectorProducer
 if selector=='bff':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffPreselModule import bffPreselProducer as preselectorProducer
+if selector=='bffv2':
+    from PhysicsTools.NanoAODTools.postprocessing.bff.bffPreselModuleV2 import bffPreselProducer as preselectorProducer
 if selector=='bff_eff':
     from PhysicsTools.NanoAODTools.postprocessing.bff.bffBtagEff import bffBtagEffProducer as preselectorProducer    
 if selector=='minseok':
@@ -105,6 +111,7 @@ conditions_dict = {
 
 #set up process for mc and data
 if isMC:
+    applyHEMfix=True
     jmeCorrections = createJMECorrector(
             isMC=isMC,
             dataYear=dataYear,
@@ -114,29 +121,35 @@ if isMC:
             applySmearing=True,
             jetType="AK4PFchs",
             noGroom=False,
-            applyHEMfix= conditions_dict[dataYear]['applyHEMfix'],
+            applyHEMfix=applyHEMfix,
         )
+    
     #don't use all modules for bff efficency calculation
     if 'eff' not in selector:
-            modules=[
+        modules=[
                 countHistogramsProducer(),
                 triggerFilter(triggers),
-                btagSF(dataYear, algo=btag_type),
+                btagSF(),
                 jmeCorrections(),
                 puWeight(),
                 muonScaleRes(),
                 lepSF(),
                 heepV72018PromptProducer(),
-                preselectorProducer(btagWP, 
-                                    triggers, 
-                                    isMC=isMC, 
-                                    btag_type=btag_type, 
-                                    record_dataframe=True, 
-                                    **conditions_dict[dataYear])
-            ]
+                preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])       ]
+        
+        if selector=='bffv2':
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, muon_pt = "correctedUp_pt", **conditions_dict[dataYear]))
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, muon_pt = "correctedDown_pt", **conditions_dict[dataYear]))
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC,  jet_sys = "jerDown", **conditions_dict[dataYear]))
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC,  jet_sys = "jerUp", **conditions_dict[dataYear]))
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, jet_sys = "jesTotalDown", **conditions_dict[dataYear]))
+            modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, jet_sys = "jesTotalUp", **conditions_dict[dataYear]))
+            if applyHEMfix:
+                    modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, jet_sys = "jesHEMIssueDown", **conditions_dict[dataYear]))
+                    modules.append(preselectorProducer(btagWP, triggers, isMC=isMC, jet_sys = "jesHEMIssueUp", **conditions_dict[dataYear]))
     else:
             modules=[
-                btagSF(dataYear, algo=btag_type),
+                btagSF(),
                 jmeCorrections(),
                 preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])
             ]
@@ -154,7 +167,7 @@ else:
             triggerFilter(triggers),
             muonScaleRes(),
             heepV72018PromptProducer(),
-            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, **conditions_dict[dataYear])
+            preselectorProducer(btagWP, triggers, isMC=isMC, btag_type=btag_type, record_dataframe=True, **conditions_dict[dataYear])
         ]
 
     p = PostProcessor(outfile,
@@ -166,7 +179,7 @@ else:
             jsonInput=runsAndLumis(),
             maxEntries=maxEntries
         )
-
+print(modules)
 p.run()
 
 print("DONE")
