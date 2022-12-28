@@ -7,7 +7,7 @@ keep Jet*
 keep *MET*
 keep HTLT*
 keep TMB*
-keep DiLepMass
+keep DiLepMass*
 keep SR*
 keep CR*
 keep Inc*
@@ -24,6 +24,7 @@ keep HLT_DoubleEle33_CaloIdL_GsfTrkIdVL
 keep HLT_TkMu100
 keep HLT_OldMu100
 keep HLT_DoubleEle25_CaloIdL_MW
+keep HLT_test
 keep *ilter*
 keep Flag_*
 keep inNregions
@@ -33,7 +34,7 @@ keep L1PreFiringWeight*
 keep TrigObj*
 keep Gen*
 keep Good*
-keep nLep
-keep nLowPtLep
+keep nLep*
+keep nLowPtLep*
 keep minGoodJet*
 keep Weight*
