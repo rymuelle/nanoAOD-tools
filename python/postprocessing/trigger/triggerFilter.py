@@ -14,11 +14,22 @@ class triggerFilter(Module):
         list_of_branches = wrappedOutputTree.tree().GetListOfBranches()
         self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
         print(self._triggers)
+        #set up branches for triggers missing in file
+        # needed for RDF since it expects all files to have all triggers
+        self.missing_triggers = [trigger for trigger in self.triggers if not trigger in list_of_branches]
+        self.out = wrappedOutputTree
+        for mt in self.missing_triggers:
+            print(mt)
+            self.out.branch(mt, "B")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
     def analyze(self, event):
+        #set missing triggers to 0
+        # might not be needed
+        for mt in self.missing_triggers:
+            self.out.fillBranch(mt, False)
         HLT_select = False
         for trigger in self._triggers:
             if event[trigger]: 
