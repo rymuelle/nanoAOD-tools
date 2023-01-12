@@ -11,9 +11,14 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
         self.mu_f_name = ["trigger","ID","ISO"]
+        self.flip_eta = [0,0,0]
+        self.not_error = [0,0,0]
+        self.error = [1,1,1]
         #identifies which f is for the trigger
         self.trigger_index = 0
-        self.mu_f_sys_name = ["ID","ISO"]
+        self.mu_f_sys_name = ["triggerUp", "triggerDown", "ID","ISO"]
+        self.sys_flip_eta = [1,1,0,0]
+        self.sys_error = [0,0,1,1]
         #2016 muon legacy
         if muonSelectionTag=="muonSF_2016_GH_legacy":
             self.mu_weights = [1]
@@ -27,11 +32,15 @@ class lepSFProducer(Module):
                 "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_stat",
                  "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
             ]
-            self.mu_sys_f=[[                  
+            self.mu_sys_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2016_RunGH_SF_ID.root",
                 "muon_legacy/2016_RunGH_SF_ISO.root"
             ]]
             self.mu_sys_h = [
+                "SF_2016_errorUpper",
+                "SF_2016_errorUpper"
                 "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
             ]
@@ -44,22 +53,27 @@ class lepSFProducer(Module):
                 "muon_legacy/2016_RunBCDEF_SF_ISO.root"
             ]]
             self.mu_h = [
-                "SF_2016_var",
+                "SF_2016_errorUpper",
+                "SF_2016_errorUpper"
                 "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_stat",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
             ]
-            self.mu_sys_f=[[                  
+            self.mu_sys_f=[[  
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2016_RunBCDEF_SF_ID.root",
                 "muon_legacy/2016_RunBCDEF_SF_ISO.root"
             ]]
             self.mu_sys_h = [
+                "SF_2016_errorUpper",
+                "SF_2016_errorUpper", 
                 "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
             ]
 
 
         if muonSelectionTag=="muonSF_2016_weighted_legacy":
-            luminosity_proportion = 0.549334044
+            luminosity_proportion = 0.55
             self.mu_weights = [luminosity_proportion,1-luminosity_proportion] #luminositiy weighted for different trigger menus
             self.mu_f=[
                           [
@@ -79,15 +93,21 @@ class lepSFProducer(Module):
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_stat"
             ]
             self.mu_sys_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2016_RunBCDEF_SF_ID.root",
                 "muon_legacy/2016_RunBCDEF_SF_ISO.root"
             ],
             [
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2016_RunGH_SF_ID.root",
                 "muon_legacy/2016_RunGH_SF_ISO.root"
             ],
             ]
             self.mu_sys_h = [
+                "SF_2016_errorUpper",
+                "SF_2016_errorUpper",  
                 "NUM_HighPtID_DEN_genTracks_eta_pair_newTuneP_probe_pt_syst",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_eta_pair_newTuneP_probe_pt_syst"
             ]
@@ -105,10 +125,14 @@ class lepSFProducer(Module):
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_stat"
             ]
             self.mu_sys_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2017_RunBCDEF_SF_ID_syst.root",
                 "muon_legacy/2017_RunBCDEF_SF_ISO_syst.root"
             ]]
             self.mu_sys_h = [
+                "SF_2017_errorUpper",
+                "SF_2017_errorUpper", 
                 "NUM_HighPtID_DEN_genTracks_pair_newTuneP_probe_pt_abseta_syst",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_syst"
             ]
@@ -126,10 +150,14 @@ class lepSFProducer(Module):
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_stat"
             ]
             self.mu_sys_f=[[
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
+                "muon_legacy/OutFile-v20190510-Combined-Run2016BtoH_Run2017BtoF_Run2018AtoD-M120to10000.root",
                 "muon_legacy/2018_RunABCD_SF_ID.root",
                 "muon_legacy/2018_RunABCD_SF_ISO.root"
             ]]
             self.mu_sys_h = [
+                "SF_2018_errorUpper",
+                "SF_2018_errorUpper", 
                 "NUM_HighPtID_DEN_TrackerMuons_pair_newTuneP_probe_pt_abseta_syst",
                 "NUM_LooseRelTkIso_DEN_HighPtIDandIPCut_pair_newTuneP_probe_pt_abseta_syst"
             ]
@@ -205,15 +233,15 @@ class lepSFProducer(Module):
         self.out.branch("Electron_effSF_sys", "F", lenVar="nElectron")
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
-    def computeSFlist(self, worker, hist_names, muons, error):
+    def computeSFlist(self, worker, hist_names, muons, errors, flips):
             sf_mu = [[] for i in range(len(worker))]
             for i in range(len(worker)):
-                for j in range(len(worker[i])):
+                for error, flip, j in zip(errors, flips, range(len(worker[i]))):
                     LEC_object = worker[i][j]
                     if "abseta" in hist_names[j]: pdgId = 13
                     else: pdgId = 99999
-                    if not error: sf_mu[i].append([LEC_object.getSF(pdgId,mu.pt,mu.eta) for mu in muons ])
-                    else: sf_mu[i].append([LEC_object.getSFErr(pdgId,mu.pt,mu.eta) for mu in muons ])
+                    if not error: sf_mu[i].append([LEC_object.getSF(pdgId, *flip_list([mu.pt, mu.eta], flip)) for mu in muons ])
+                    else: sf_mu[i].append([LEC_object.getSFErr(pdgId, *flip_list([mu.pt, mu.eta], flip)) for mu in muons ])
             averaged_sf_mu = np.multiply(self.mu_weights[0], sf_mu[0])
             for i in range(len(sf_mu)-1):
                 averaged_sf_mu = np.add(averaged_sf_mu,np.multiply(self.mu_weights[i+1],sf_mu[i+1]))
@@ -245,15 +273,14 @@ class lepSFProducer(Module):
         electrons = Collection(event, "Electron")
         trigObjs = Collection(event, "TrigObj")
         muonTrigObjs = list(filter(muon_selection, trigObjs))
-        averaged_sf_mu = self.computeSFlist(self._worker_mu,self.mu_h,muons,False)
-        averaged_sf_mu_stat = self.computeSFlist(self._worker_mu,self.mu_h,muons,True)
+        averaged_sf_mu = self.computeSFlist(self._worker_mu,self.mu_h,muons, self.not_error, self.flip_eta)
+        averaged_sf_mu_stat = self.computeSFlist(self._worker_mu,self.mu_h,muons, self.error, self.flip_eta)
         # trigger histogram error and center value is switched, so flip them
         trigger_center_value = copy.deepcopy(averaged_sf_mu[0])
         trigger_error = copy.deepcopy(averaged_sf_mu_stat[0])
         averaged_sf_mu[0] = trigger_error
         averaged_sf_mu_stat[0] = trigger_center_value
-        
-        averaged_sf_mu_sys = self.computeSFlist(self._worker_sys_mu,self.mu_sys_h,muons,True)
+        averaged_sf_mu_sys = self.computeSFlist(self._worker_sys_mu,self.mu_sys_h,muons, self.sys_error, self.sys_flip_eta)
         #set trigger sf to 1 if not trigger object
         for i, muon in enumerate(muons):
             muonIsTriggerObj = False
@@ -264,7 +291,8 @@ class lepSFProducer(Module):
             if not muonIsTriggerObj:
                 averaged_sf_mu[self.trigger_index][i] = 1
                 averaged_sf_mu_stat[self.trigger_index][i] = 0
-                
+                averaged_sf_mu_sys[0][i] = 0
+                averaged_sf_mu_sys[1][i] = 0       
         for i, type_SF in enumerate(self.mu_f_name):
             self.out.fillBranch("Muon_effSF_{}".format(type_SF), averaged_sf_mu[i])
             self.out.fillBranch("Muon_effSF_stat_{}".format(type_SF), averaged_sf_mu_stat[i])
@@ -286,7 +314,10 @@ def deltaR(obj1, obj2):
 def isKthBitSet(n, k): return bool(n & (1 << (k-1)))
 def muon_selection(trigObj):
     return (trigObj.id==13) & isKthBitSet(trigObj.filterBits, 11)
-
+def flip_list(arr, flip):
+    if flip: arr.reverse()
+    return arr
+        
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 lepSF2016 = lambda : lepSFProducer( "muonSF_2016_weighted_legacy", "egamma_2016_legacy")
