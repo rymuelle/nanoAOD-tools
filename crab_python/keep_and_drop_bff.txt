@@ -38,3 +38,10 @@ keep nLep*
 keep nLowPtLep*
 keep minGoodJet*
 keep Weight*
+keep HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
+keep HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
+keep HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
+keep HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL
+keep HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
+keep HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165
+keep HLT_Photon175
